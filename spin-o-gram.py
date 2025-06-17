@@ -47,10 +47,13 @@ def adjust_axis(ax):
     ax[1].set_thetalim(0,np.pi)
     ax[1].set_title("m$_z$",loc='right')
 
-def get_momdist(restart_file,NDIV=180) :
+def get_momdist(restart_file,ntypes,NDIV=180) :
 
     raw_data = np.genfromtxt(restart_file) # cartesian
-    idx = np.logical_and(raw_data[:,0]==-1,raw_data[:,1]==1)
+    iterens= np.unique(raw_data[:,0])[-1]
+    iatom= np.unique(raw_data[:,1])[-1]
+    idx = np.logical_and(raw_data[:,0]==iterens,raw_data[:,1]==iatom)
+    #idx = np.logical_and(raw_data[:,0]==-1,raw_data[:,1]==1)
     raw_data = raw_data[idx][:,[3,4,5,6]] #
 
     # Convert to spherical coordinates according to the physical convention
@@ -63,16 +66,26 @@ def get_momdist(restart_file,NDIV=180) :
     theta_weights =np.abs(1 / np.sqrt(1 - raw_data[:,3]**2)  )
 
     # Find different types of magnetic sites
-    mag_types = np.unique(spherical[:,0])
-    ntypes = len(mag_types)
+    
+    if ntypes == 0:
+        mag_types = np.unique(spherical[:,0])
+        ntypes = len(mag_types)
+    
+        # Get indexes of entries associated with each magnetic type
+        idx_mag=[]
+        for ii in range(ntypes):
+            idx_mag.append(np.where(spherical[:,0]==mag_types[ii])[0])
+    else :
+        mag_types = np.arange(1,ntypes+1)
+
+        idx_mag=[]
+        for ii in range(ntypes):
+            idx_mag.append(np.arange(ii,len(spherical),ntypes))
+
 
     cmap = plt.get_cmap('tab10') 
     colors = cmap(range(ntypes))
    
-    # Get indexes of entries associated with each magnetic type
-    idx_mag=[]
-    for ii in range(ntypes):
-        idx_mag.append(np.where(spherical[:,0]==mag_types[ii])[0])
         
     phi_bins = np.linspace(-np.pi,np.pi,NDIV)
     theta_bins = np.linspace(0,np.pi,int(NDIV/2))
@@ -164,11 +177,13 @@ def rename_label(line, entry_widget):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plots radial histogram of spins distribution')
     parser.add_argument('--file','-f', type=str,default='restart.*.out', help='UppASD output restart.*.out  file')
+    parser.add_argument('--nsites','-s', type=int,default='0', help='Number of sites in posfile, changes proj mode')
     parser.add_argument('--NDIV', type=int, default='180', help='Number of bins to divide the radial angle in')
     args = parser.parse_args()
     
     restart_file = glob.glob(args.file)[0]
-    data_bins,data_hist= get_momdist(restart_file,args.NDIV)
+    nsites = args.nsites
+    data_bins,data_hist= get_momdist(restart_file,nsites,args.NDIV)
 
     # Create the main window
     root = tk.Tk()
@@ -350,4 +365,5 @@ if __name__ == "__main__":
 
     # Start the Tkinter main loop
     root.mainloop()
+
 
