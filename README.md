@@ -2,6 +2,10 @@
 
 **Spin-o-gram** is a Python-based GUI tool for **visualizing and preparing plots of spin distributions** from [UppASD](https://github.com/UppASD/UppASD) simulations.
 
+Please cite generously to spread the word around :)
+
+[![DOI](https://zenodo.org/badge/898016749.svg)](https://doi.org/10.5281/zenodo.15700295)
+
 ---
 
 ## 📦 Features
