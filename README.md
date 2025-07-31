@@ -2,6 +2,7 @@
 
 **Spin-o-gram** is a simple portable Python-based GUI tool for **visualizing and preparing plots of spin distributions** from [UppASD](https://github.com/UppASD/UppASD) simulations. 
 The tool is aimed to be used directly in HPC servers, with X11 forwarding.
+
 For advanced analysis and visualisation, we strongly recommend the SpinView package (https://github.com/mxjk851/spinview)
 
 Please cite generously to spread the word around :)
